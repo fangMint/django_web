@@ -24,7 +24,6 @@ class PlayDB:
         return time_stamp
 
     def save(self, **kwargs):
-        print("进入")
         tc = 0
         for k, v in kwargs.items():
             tc += 1
@@ -54,10 +53,10 @@ class PlayDB:
         raise ValueError(f"{key} does not exists in store")
 
     def get(self, key):
-        self.__get_or_consume(key, _all=False, _d=False)
+        return self.__get_or_consume(key, _all=False, _d=False)
 
     def consume(self, key):
-        self.__get_or_consume(key, _all=False, _d=True)
+        return self.__get_or_consume(key, _all=False, _d=True)
 
     def show(self, key, _all=False):
         if key in self.__store.keys():
