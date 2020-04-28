@@ -42,15 +42,22 @@ class PlayDB:
             return {key: tv}
         return False
 
-    def get(self, key, _all=False):
+    def __get_or_consume(self, key, _all=False, _d=False):
         if key in self.__store.keys():
             if not _all:
                 this_value = self.__store.get(key)["value"]
             else:
                 this_value = self.__store.get(key)
-            self.delete(key)
+            if _d:
+                self.delete(key)
             return this_value
         raise ValueError(f"{key} does not exists in store")
+
+    def get(self, key):
+        self.__get_or_consume(key, _all=False, _d=False)
+
+    def consume(self, key):
+        self.__get_or_consume(key, _all=False, _d=True)
 
     def show(self, key, _all=False):
         if key in self.__store.keys():
