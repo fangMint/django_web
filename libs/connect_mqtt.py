@@ -22,7 +22,7 @@ class MQTTConnect:
         self.client = None
         self.__connect()
 
-    def __connect(self):
+    def __connect(self, at=False):
         try:
             client_id = time.strftime(f'{self.uid_pre}%Y%m%d%H%M%S', time.localtime(time.time()))
             # transport会自动在ip上加一个ws://
@@ -40,33 +40,29 @@ class MQTTConnect:
             client.on_disconnect = self.__on_disconnect
             client.loop_start()
             client.will_set("test", payload="i will go back", qos=2, retain=False)
-            time.sleep(1)
-            # TODO 睡一秒解决连接之后不能立刻发送消息
+            if at:
+                time.sleep(1)
+                # 睡一秒解决连接之后不能立刻发送消息
             self.client = client
         except BaseException as err:
             print(err)
             raise
 
-    def __on_connect(self, client, userdata, flags, rc):
+    def __on_connect(self, client, user_data, flags, rc):
         print(f"mqtt is connect  {client._client_id} ")
         for topic, callback in self.subscribe_dict.items():
             self.__subscribe(topic, callback)
 
-    def __on_disconnect(self, client, userdata, rc):
-        """
-        项目重启,连接中断都会触发
-        :param client:
-        :param userdata:
-        :param rc:
-        :return:
-        """
-        print(f"断开连接: {client._client_id} ")
+    def __on_disconnect(self, client, user_data, rc):
+        # 项目重启,连接中断都会触发
+        print("断开连接", client._client_id)
 
-    def __on_subscribe(self, client, userdata, mid, granted_qos):
-        print("订阅", client, userdata, mid, granted_qos)
+    def __on_subscribe(self, client, user_data, mid, granted_qos):
+        # mid在订阅时也会累加
+        print("订阅", client, user_data, mid, granted_qos)
 
-    def __on_publish(self, client, userdata, mid):
-        print(f"mqtt发送_{mid}")
+    def __on_publish(self, client, user_data, mid):
+        print("mqtt发送", mid)
 
     def __subscribe(self, t, cb):
         print(f"subscribe {t}")
