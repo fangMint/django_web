@@ -6,8 +6,12 @@
 # Software : PyCharm
 # ==================================
 import datetime
+import logging
 
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BackgroundScheduler
+
+log = logging.getLogger(__name__)
 
 
 class MyScheduler:
@@ -25,6 +29,7 @@ class MyScheduler:
                   ):
         self.__scheduler.add_job(func, trigger, args, kwargs, id, name, jobstore=jobstore, executor=executor,
                                  replace_existing=replace_existing, **trigger_args)
+        self.__scheduler.add_listener(self.job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
     def cron_add_job(self, func, day_of_week='0-6', hour=0, minute=0, second=0, _datetime=""):
         """
@@ -43,3 +48,24 @@ class MyScheduler:
 
     def interval_add_job(self, func, seconds=0):
         self.__add_job(func, "interval", seconds=seconds)
+
+    def date_add_job(self, func, run_date=""):
+        # 定时执行一次，执行完之后任务就会自动移除
+        self.__add_job(func, "date", run_date=run_date)
+
+    def date_second(self, func, seconds=0, minutes=0, hours=0, days=0):
+        now_date = datetime.datetime.now()
+        add_second = datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+        fin_date = now_date + add_second
+        fin_date_str = fin_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.date_add_job(func, run_date=fin_date_str)
+
+    def print_jobs(self):
+        log.info(self.__scheduler.running)
+        self.__scheduler.print_jobs()
+
+    def job_listener(self, event):
+        if event.exception:
+            log.error(f'任务出错了！！！！！！')
+        else:
+            pass
