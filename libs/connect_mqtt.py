@@ -1,7 +1,9 @@
 import json
-
+import logging
 import paho.mqtt.client as m_client
 import time
+
+log = logging.getLogger(__name__)
 
 
 class MQTTConnect:
@@ -39,33 +41,33 @@ class MQTTConnect:
             client.on_publish = self.__on_publish
             client.on_disconnect = self.__on_disconnect
             client.loop_start()
-            client.will_set("test", payload="i will go back", qos=2, retain=False)
+            client.will_set("will_topic", payload="i will go back", qos=2, retain=False)
             if at:
                 time.sleep(1)
                 # 睡一秒解决连接之后不能立刻发送消息
             self.client = client
         except BaseException as err:
-            print(err)
+            log.error(err)
             raise
 
     def __on_connect(self, client, user_data, flags, rc):
-        print(f"mqtt is connect  {client._client_id} ")
+        log.debug(f"mqtt is connect  {client._client_id} ")
         for topic, callback in self.subscribe_dict.items():
             self.__subscribe(topic, callback)
 
     def __on_disconnect(self, client, user_data, rc):
         # 项目重启,连接中断都会触发
-        print("断开连接", client._client_id)
+        log.debug("断开连接", client._client_id)
 
     def __on_subscribe(self, client, user_data, mid, granted_qos):
         # mid在订阅时也会累加
-        print("订阅", client, user_data, mid, granted_qos)
+        log.debug("订阅", client, user_data, mid, granted_qos)
 
     def __on_publish(self, client, user_data, mid):
-        print("mqtt发送", mid)
+        log.debug("mqtt发送", mid)
 
     def __subscribe(self, t, cb):
-        print(f"subscribe {t}")
+        log.debug(f"subscribe {t}")
         self.client.message_callback_add(t, cb)
         self.client.subscribe(t, self.qos)
 
