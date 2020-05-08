@@ -27,7 +27,7 @@ class PlayDB:
         tc = 0
         for k, v in kwargs.items():
             tc += 1
-            if k not in self.__store.keys():
+            if not self.key_is_exists(k):
                 db_data = {"value": v, "data_stamp": self.__timestamp()}
             else:
                 db_data = {"value": v, "data_stamp": self.__store[k]["data_stamp"]}
@@ -35,14 +35,14 @@ class PlayDB:
         return tc
 
     def delete(self, key):
-        if key in self.__store.keys():
+        if self.key_is_exists(key):
             tv = self.__store.get(key)
             del self.__store[key]
             return {key: tv}
         return False
 
     def __get_or_consume(self, key, _all=False, _d=False):
-        if key in self.__store.keys():
+        if self.key_is_exists(key):
             if not _all:
                 this_value = self.__store.get(key)["value"]
             else:
@@ -52,22 +52,17 @@ class PlayDB:
             return this_value
         raise ValueError(f"{key} does not exists in store")
 
+    def update(self, **kwargs):
+        return self.save(**kwargs)
+
     def get(self, key):
         return self.__get_or_consume(key, _all=False, _d=False)
 
     def consume(self, key):
         return self.__get_or_consume(key, _all=False, _d=True)
 
-    def show(self, key, _all=False):
-        if key in self.__store.keys():
-            if not _all:
-                return self.__store.get(key)["value"]
-            else:
-                return self.__store.get(key)
-        raise -1
-
-    def update(self, **kwargs):
-        return self.save(**kwargs)
+    def key_is_exists(self, key):
+        return key in self.__store.keys()
 
 
 play_global = PlayDB(inherited=True)
