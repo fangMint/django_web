@@ -49,16 +49,19 @@ class MyScheduler:
     def interval_add_job(self, func, seconds=0):
         self.__add_job(func, "interval", seconds=seconds)
 
-    def date_add_job(self, func, run_date=""):
-        # 定时执行一次，执行完之后任务就会自动移除
-        self.__add_job(func, "date", run_date=run_date)
+    def date_add_job(self, func, args=None, run_date="", job_id=""):
+        # 定时执行一次，执行完之后任务就会自动移除,若错过指定运行时间，任务不会被创建
+        self.__add_job(func, "date", args=args, run_date=run_date, id=job_id)
 
-    def date_second(self, func, seconds=0, minutes=0, hours=0, days=0):
+    def date_second(self, func, args=None, seconds=0, minutes=0, hours=0, days=0, job_id=""):
         now_date = datetime.datetime.now()
         add_second = datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
         fin_date = now_date + add_second
         fin_date_str = fin_date.strftime("%Y-%m-%d %H:%M:%S")
-        self.date_add_job(func, run_date=fin_date_str)
+        self.date_add_job(func, args=args, run_date=fin_date_str, job_id=job_id)
+
+    def remove_job(self, job_id):
+        self.__scheduler.remove_job(job_id)
 
     def print_jobs(self):
         log.info(self.__scheduler.running)
@@ -69,3 +72,6 @@ class MyScheduler:
             log.error(f'任务出错了！！！！！！')
         else:
             pass
+
+
+my_scheduler = MyScheduler()
