@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sf=sources/test.conf
+sf=sources/demo.conf
 
 sudo apt update
 sudo apt install supervisor -y
