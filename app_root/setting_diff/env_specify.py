@@ -9,7 +9,7 @@ import socket
 import os
 
 # 指定环境，dev, test, prod可选。生产环境一定要去除！！！
-SPECIAL_ENV = "test"
+SPECIAL_ENV = ""
 
 # 开发环境机器
 DEVELOPER = [
