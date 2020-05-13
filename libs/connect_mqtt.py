@@ -12,7 +12,7 @@ class MQTTConnect:
     pub时指定的qos是服务器肯定按此规则接收，但是最终订阅者不一定。
     sub时指定的qos表示订阅者可以接收的最高消息等级，也就是可能收到更低等级的消息。
     """
-    def __init__(self, host, port, keepalive=60, qos=0, username=None, password=None, uid_pre=""):
+    def __init__(self, host, port, keepalive=60, qos=0, username=None, password=None, uid_pre="", at=False):
         self.host = host
         self.port = port
         self.uid_pre = uid_pre
@@ -22,7 +22,7 @@ class MQTTConnect:
         self.qos = qos
         self.subscribe_dict = {}
         self.client = None
-        self.__connect()
+        self.__connect(at=at)
 
     def __connect(self, at=False):
         try:
