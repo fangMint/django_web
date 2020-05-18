@@ -3,8 +3,6 @@ import logging
 import paho.mqtt.client as m_client
 import time
 
-log = logging.getLogger(__name__)
-
 
 class MQTTConnect:
     """
@@ -12,7 +10,7 @@ class MQTTConnect:
     pub时指定的qos是服务器肯定按此规则接收，但是最终订阅者不一定。
     sub时指定的qos表示订阅者可以接收的最高消息等级，也就是可能收到更低等级的消息。
     """
-    def __init__(self, host, port, keepalive=60, qos=0, username=None, password=None, uid_pre="", at=False):
+    def __init__(self, host, port, keepalive=60, qos=0, username=None, password=None, uid_pre="", at=False, logger=__name__):
         self.host = host
         self.port = port
         self.uid_pre = uid_pre
@@ -23,6 +21,7 @@ class MQTTConnect:
         self.subscribe_dict = {}
         self.client = None
         self.__connect(at=at)
+        self.log = logging.getLogger(logger)
 
     def __connect(self, at=False):
         try:
@@ -47,33 +46,34 @@ class MQTTConnect:
                 # 睡一秒解决连接之后不能立刻发送消息
             self.client = client
         except BaseException as err:
-            log.error(err)
+            self.log.error(err)
             raise
 
     def __on_connect(self, client, user_data, flags, rc):
-        log.debug(f"mqtt is connect  {client._client_id} ")
+        self.log.info(f"mqtt is connect  {client._client_id} ")
         for topic, callback in self.subscribe_dict.items():
             self.__subscribe(topic, callback)
 
     def __on_disconnect(self, client, user_data, rc):
         # 项目重启,连接中断都会触发
-        log.debug("断开连接", client._client_id)
+        self.log.error(f"断开连接 {client._client_id}")
 
     def __on_subscribe(self, client, user_data, mid, granted_qos):
         # mid在订阅时也会累加
-        log.debug("订阅", client, user_data, mid, granted_qos)
+        # self.log.debug(f"订阅 {user_data, mid, granted_qos}")
+        pass
 
     def __on_publish(self, client, user_data, mid):
-        log.debug("mqtt发送", mid)
+        self.log.debug(f"mqtt发送 {mid}")
 
     def __subscribe(self, t, cb):
-        log.debug(f"subscribe {t}")
         self.client.message_callback_add(t, cb)
         self.client.subscribe(t, self.qos)
 
     def add_subscribe(self, topic, callback):
         self.subscribe_dict[topic] = callback
         self.__subscribe(topic, callback)
+        self.log.debug(f"subscribe {topic}")
 
     def publish_only(self, topic, payload, qos=None):
         qos = self.qos if not qos else qos
