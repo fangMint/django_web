@@ -9,6 +9,7 @@ import datetime
 import logging
 
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 log = logging.getLogger(__name__)
@@ -61,7 +62,10 @@ class MyScheduler:
         self.date_add_job(func, args=args, run_date=fin_date_str, job_id=job_id)
 
     def remove_job(self, job_id):
-        self.__scheduler.remove_job(job_id)
+        try:
+            self.__scheduler.remove_job(job_id)
+        except JobLookupError as err:
+            log.error(f"没有任务{job_id}")
 
     def print_jobs(self):
         log.info(self.__scheduler.running)
