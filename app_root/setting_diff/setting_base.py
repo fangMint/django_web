@@ -114,7 +114,14 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'  # 前端访问
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static")
+# ]
+
+MEDIA_URL = "/media/"  # 前端访问
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ====== logging ======
 BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")

@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls import url
+from django.views.static import serve
+from app_root.settings import MEDIA_ROOT
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT})
 ]
+
+urlpatterns += staticfiles_urlpatterns()
