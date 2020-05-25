@@ -42,8 +42,7 @@ class MQTTConnect:
             client.loop_start()
             client.will_set("will_topic", payload="i will go back", qos=2, retain=False)
             if at:
-                time.sleep(1)
-                # 睡一秒解决连接之后不能立刻发送消息
+                time.sleep(0.045)  # 小于0.043秒不能立刻发送消息
             self.client = client
         except BaseException as err:
             self.log.error(err)
