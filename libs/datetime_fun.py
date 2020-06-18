@@ -1,88 +1,85 @@
+# ==================================
+# Author   : fang
+# Time     : 2020/5/30 16:18
+# Email    : zhen.fang@qdreamer.com
+# File     : datetime_fun.py
+# Software : PyCharm
+# ==================================
 import datetime
 import time
 
 
-def datetime_now_to_timestamp(digits=13):
-    """
-    将当前时间规范成13位时间戳
-    :param digits:
-    :return:
-    """
-    time_stamp = datetime.datetime.now().timestamp()
-    digits = 10 ** (digits - 10)
-    time_stamp = int(round(time_stamp*digits))
-    return str(time_stamp)
-
-
-def date_to_timestamp(date="today", digits=13):
-    """
-    将今天date规范成13位时间戳
-    :param date:
-    :param digits
-    :return:
-    """
-    now_datetime = datetime.datetime.now()
-    if date == "today":
-        pass
-    elif date == "tomorrow":
-        diff_time = datetime.timedelta(days=1)
-        now_datetime = now_datetime + diff_time
-    date_time = now_datetime.strftime("%Y-%m-%d 00:00:00")
-    date_timestamp = datetime.datetime.strptime(date_time, "%Y-%m-%d 00:00:00").timestamp()
-    time_stamp = int(date_timestamp * (10 ** (digits - len(str(int(date_timestamp))))))
+def timestamp_length(timestamp, length=13):
+    time_stamp = int(timestamp) * (10 ** (length-len(str(int(timestamp)))))
     return time_stamp
 
 
-def date_now_to_str(format_string="%Y%m%d"):
-    """
-    将当天日期格式化成字符串
-    :param format_string:
-    :return:
-    """
-    now_datetime = datetime.datetime.now()
-    date_time = now_datetime.strftime(format_string)
-    return date_time
+def string_2_datetime(string: str, format_str="%Y-%m-%d %H:%M:%S"):
+    return datetime.datetime.strptime(string, format_str)
 
 
-def remove_symbol(dt_str):
-    """
-    删除时间字符串中的符号
-    :param dt_str:
-    :return:
-    """
-    return dt_str.replace("-", "").replace(":", "").replace(" ", "")
+def string_2_time_tuple(string: str, format_str="%Y-%m-%d %H:%M:%S"):
+    return time.strptime(string, format_str)
 
 
-def datetime_to_timestamp(date, format_string="%Y-%m-%d %H:%M:%S", digits=13):
-    """
-    将时间字符串转换为10位时间戳，时间字符串默认为2017-10-01 13:37:04格式
-    :param date:
-    :param format_string:
-    :return:
-    """
-    count = date.count(":")
-    if count == 1:
-        format_string = "%Y-%m-%d %H:%M"
-    time_array = datetime.datetime.strptime(date, format_string)
-    time_stamp = int(time_array.timestamp())
-    time_stamp = int(time_stamp * (10 ** (13 - len(str(time_stamp)))))
-    return time_stamp
+def string_2_timestamp(string: str, format_str="%Y-%m-%d %H:%M:%S"):
+    time_tuple = string_2_time_tuple(string, format_str)
+    timestamp = time.mktime(time_tuple)
+    # 方法2
+    # dt = string_2_datetime(string, format_str)
+    # timestamp = dt.timestamp()
+    return timestamp_length(timestamp, 13)
 
 
-# 将时间戳规范为10位时间戳
-def timestamp_to_timestamp10(time_stamp):
-    time_stamp = int(time_stamp* (10 ** (10-len(str(time_stamp)))))
-    return time_stamp
+def datetime_2_string(dt: datetime):
+    return dt.strftime()
 
 
-# 将13位时间戳转换为时间字符串，默认为2017-10-01 13:37:04格式
-def timestamp_13_to_date(time_stamp, format_string="%Y-%m-%d %H:%M:%S"):
-    time_stamp_10 = timestamp_to_timestamp10(time_stamp)
-    time_array = time.localtime(time_stamp_10)
-    str_date = time.strftime(format_string, time_array)
-    return str_date
+def datetime_2_timestamp(dt: datetime):
+    timestamp = dt.timestamp()
+    return timestamp_length(timestamp, 13)
+
+
+def datetime_2_time_tuple(dt: datetime):
+    return dt.timetuple()
+
+
+def __timestamp_2_time_tuple(timestamp):
+    return time.localtime(timestamp)  # 只接受十位，不然解析出错
+
+
+def timestamp_2_string(timestamp, format_str="%Y-%m-%d %H:%M:%S"):
+    timestamp = timestamp_length(timestamp, 10)
+    time_tuple = __timestamp_2_time_tuple(timestamp)
+    return time.strftime(format_str, time_tuple)
+
+
+def timestamp_2_datetime(timestamp):
+    if isinstance(timestamp, (str, int)):
+        timestamp = float(timestamp)
+    timestamp = timestamp_length(timestamp, 10)
+    return datetime.datetime.fromtimestamp(timestamp)
+
+
+def string_2_date(string: str, format_str="%Y-%m-%d"):  # 或者datetime -> date
+    dt = string_2_datetime(string, format_str)
+    return datetime.datetime.date(dt)
+
+
+def now_2_timestamp(length=13):
+    timestamp = datetime.datetime.now().timestamp()
+    return timestamp_length(timestamp, length)
 
 
 if __name__ == '__main__':
-    s = date_to_timestamp(date="tomorrow")
-    print(timestamp_13_to_date(s))
+    t = "2020-06-04 23:04"
+    s1 = string_2_datetime(t, format_str="%Y-%m-%d %H:%M")
+    print(s1)
+    print(datetime.datetime.date(s1))
+    s2 = string_2_timestamp(t, format_str="%Y-%m-%d %H:%M")
+    print(s2)
+    s4 = timestamp_2_string(s2)
+    print(s4)
+    s5 = timestamp_2_datetime(s2)
+    print(s5)
+    print(now_2_timestamp())

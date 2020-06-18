@@ -68,7 +68,7 @@ class MyScheduler:
             log.error(f"没有任务{job_id}")
 
     def print_jobs(self):
-        log.info(self.__scheduler.running)
+        # log.info(self.__scheduler.running)
         self.__scheduler.print_jobs()
 
     def job_listener(self, event):
