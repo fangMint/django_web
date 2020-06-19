@@ -16,7 +16,6 @@ django项目模板，主要项目架构的规范。有uwsgi，supervisor，docke
 
 `apps`建议存放所有的application，并且建议按一张表的增删改查常见不同的application，目前已经有一个users，users实现了基于token的认证。
   
-
 ---
  ## 致大家🙋‍♀️🙋‍♂️
  如果本项目帮助到了你。 
